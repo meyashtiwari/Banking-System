@@ -8,10 +8,6 @@ class Banking_System
     static private string Title, Name, LastLoginDetails, Password;
     static private SqlConnection connection;
 
-    private static string[] sqlCommand = new string[] {"select max(AccountNumber) from UserData",
-                                                       "select * from UserData where AccountNumber = " + Account_Number,
-                                                       "insert into UserData values(" + Account_Number + ",'" + Title + "','" + Name + "'," + Total_Balance + ",'" + Password + "'," + "SYSDATETIME())"};
-
     private int Menu()
     {
         Console.WriteLine("1. Login for Existing Customers");
@@ -22,7 +18,17 @@ class Banking_System
         return (int.Parse(Console.ReadLine()));
     }
 
-    private void SignUp()
+    private static string ReturnSqlCommand(int i)
+    {
+        string[] sqlCommand = new string[] {"select max(AccountNumber) from UserData",
+                                            "select * from UserData where AccountNumber = " + Account_Number,
+                                            "insert into UserData values(" + Account_Number + ",'" + Title + "','" + Name + "'," + Total_Balance + ",'" + Password + "'," + "SYSDATETIME())",
+                                            "update UserData set Title = '" + Title + "', Name = '" + Name + "', TotalBalance = " + Total_Balance + ", LastLoginDetails = SYSDATETIME() where AccountNumber = " + Account_Number
+                                           };
+        return sqlCommand[i];
+    }
+
+private void SignUp()
     {
         Console.WriteLine("Enter your Full Name : ");
         Name = Console.ReadLine();
@@ -34,7 +40,7 @@ class Banking_System
         Console.WriteLine("Enter the amount you want to deposit[Min Rs. 500] : ");
         Total_Balance = UInt32.Parse(Console.ReadLine());
         GenerateAccountNumber();
-        SetDataToTheDatabase();
+        SetDataToTheDatabase(1);
         Console.WriteLine("Thanks for banking with us | Your generated account number is " + Account_Number);
         Console.WriteLine("Please note down your account number and password");
     }   
@@ -42,10 +48,10 @@ class Banking_System
     private static void GenerateAccountNumber()
     {
         EstablishConnectionWithDatabase();
-        SqlCommand command = new SqlCommand(sqlCommand[0], connection);
+        SqlCommand command = new SqlCommand(ReturnSqlCommand(0), connection);
         SqlDataReader dataReader = command.ExecuteReader();
-
-        if (dataReader.Read())
+        dataReader.Read();
+        if (("" + dataReader.GetValue(0)) != "")
         {
             Account_Number = UInt32.Parse("" + dataReader.GetValue(0)) + 1;
         }
@@ -81,10 +87,10 @@ class Banking_System
     {
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("\nAccount Number            : {0,5}", Account_Number);
-        Console.WriteLine("Account Holder's Name     : {0,5}", Name);
-        Console.WriteLine("Total Balance in account  : {0,5}", "Rs. " + Total_Balance);
-        Console.WriteLine("Last Login Details        : {0,5}", LastLoginDetails);
+        Console.WriteLine("\nAccount Number            : {0,10}", Account_Number);
+        Console.WriteLine("Account Holder's Name     : {0,17}", Title + ". " +Name);
+        Console.WriteLine("Total Balance in account  : {0,10}", "Rs. " + Total_Balance);
+        Console.WriteLine("Last Login Details        : {0,21}", LastLoginDetails);
         Console.ResetColor();
     }
 
@@ -106,15 +112,16 @@ class Banking_System
     private static bool GetDataFromTheDatabase()
     {
         bool AccountFound = false;
-        SqlCommand command = new SqlCommand(sqlCommand[1], connection);
+        SqlCommand command = new SqlCommand(ReturnSqlCommand(1), connection);
         SqlDataReader dataReader = command.ExecuteReader();
 
         if (dataReader.Read())
         {
-            Title = ("" + dataReader.GetValue(1) + ". ");
-            Name = (Title + dataReader.GetValue(2));
+            Title = ("" + dataReader.GetValue(1));
+            Name = ("" + dataReader.GetValue(2));
             Total_Balance = Double.Parse("" + dataReader.GetValue(3));
-            LastLoginDetails = ("" + dataReader.GetValue(4));
+            Password = ("" + dataReader.GetValue(4));
+            LastLoginDetails = ("" + dataReader.GetValue(5));
             AccountFound = true;
         }
         else
@@ -128,11 +135,14 @@ class Banking_System
         return AccountFound;
     }
 
-    private static void SetDataToTheDatabase()
+    private static void SetDataToTheDatabase(int choice)
     {
         EstablishConnectionWithDatabase();
-        SqlCommand command = new SqlCommand(sqlCommand[2], connection);
+        string LocalSqlCommand = (choice == 1) ? ReturnSqlCommand(2) : ReturnSqlCommand(3);
+        SqlCommand command = new SqlCommand(LocalSqlCommand, connection);
         command.ExecuteNonQuery();
+        command.Dispose();
+        connection.Close();
     }
 
     private void Login()
@@ -142,24 +152,38 @@ class Banking_System
         EstablishConnectionWithDatabase();
         if (GetDataFromTheDatabase())
         {
-            bool LoggedInFlag = true;
-            ShowUserDetails();
-            while (LoggedInFlag)
+            Console.WriteLine("Enter your account password : ");
+            string UserPassword = Console.ReadLine();
+            if (UserPassword == Password)
             {
-                switch(LoggedInMenu())
+                bool LoggedInFlag = true;
+                ShowUserDetails();
+                while (LoggedInFlag)
                 {
-                    case 1: DepositMoney();
+                    switch (LoggedInMenu())
+                    {
+                        case 1:
+                            DepositMoney();
                             break;
-                    case 2: WithdrawMoney();
+                        case 2:
+                            WithdrawMoney();
                             break;
-                    case 3: TransferMoney();
+                        case 3:
+                            TransferMoney();
                             break;
-                    case 4: Logout();
+                        case 4:
+                            Logout();
                             LoggedInFlag = false;
                             break;
-                    default:Console.WriteLine("Incorrect Option");
-                            break; 
+                        default:
+                            Console.WriteLine("Incorrect Option");
+                            break;
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("The password you entered is incorrect");
             }
         }
     }
@@ -181,7 +205,11 @@ class Banking_System
 
     private static void Logout()
     {
-
+        EstablishConnectionWithDatabase();
+        SetDataToTheDatabase(2);
+        Account_Number = 0;
+        Total_Balance = 0;
+        Title = Name = LastLoginDetails = Password = "";
     }
 
     static void Main(string[] args)
