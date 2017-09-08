@@ -30,14 +30,14 @@ class Banking_System
 
 private void SignUp()
     {
-        Console.WriteLine("Enter your Full Name : ");
+        Console.Write("Enter your Full Name : ");
         Name = Console.ReadLine();
-        Console.WriteLine("Enter your gender[M/F] : ");
+        Console.Write("Enter your gender[M/F] : ");
         string Gender = Console.ReadLine();
         Title = (Gender == "M" || Gender == "m") ? "Mr" : "Ms"; 
-        Console.WriteLine("Enter a password for your account[min 8 characters] : ");
+        Console.Write("Enter a password for your account[min 8 characters] : ");
         Password = Console.ReadLine();
-        Console.WriteLine("Enter the amount you want to deposit[Min Rs. 500] : ");
+        Console.Write("Enter the amount you want to deposit[Min Rs. 500] : ");
         Total_Balance = UInt32.Parse(Console.ReadLine());
         GenerateAccountNumber();
         SetDataToTheDatabase(1);
@@ -152,7 +152,7 @@ private void SignUp()
         EstablishConnectionWithDatabase();
         if (GetDataFromTheDatabase())
         {
-            Console.WriteLine("Enter your account password : ");
+            Console.Write("Enter your account password : ");
             string UserPassword = Console.ReadLine();
             if (UserPassword == Password)
             {
@@ -172,6 +172,9 @@ private void SignUp()
                             TransferMoney();
                             break;
                         case 4:
+                            ShowUserDetails();
+                            break;
+                        case 5:
                             Logout();
                             LoggedInFlag = false;
                             break;
@@ -190,12 +193,16 @@ private void SignUp()
 
     private static void DepositMoney()
     {
-
+        Console.Write("Enter amount you want to deposit : ");
+        Total_Balance += UInt32.Parse(Console.ReadLine());
+        Console.WriteLine("Amount deposited in your account successfully!");
     }
 
     private static void WithdrawMoney()
     {
-
+        Console.Write("Enter amount you want to withdraw : ");
+        Total_Balance -= UInt32.Parse(Console.ReadLine());
+        Console.WriteLine("Amount withdrawal from your account was successfull!");
     }
 
     private static void TransferMoney()
