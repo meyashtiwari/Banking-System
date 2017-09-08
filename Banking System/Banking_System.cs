@@ -3,8 +3,8 @@ using System.Data.SqlClient;
 
 class Banking_System
 {
-    static private UInt32 Account_Number;
-    static private Double Total_Balance;
+    static private UInt32 Account_Number, TransferAccount;
+    static private Double Total_Balance, TransferBalance;
     static private string Title, Name, LastLoginDetails, Password;
     static private SqlConnection connection;
 
@@ -23,7 +23,9 @@ class Banking_System
         string[] sqlCommand = new string[] {"select max(AccountNumber) from UserData",
                                             "select * from UserData where AccountNumber = " + Account_Number,
                                             "insert into UserData values(" + Account_Number + ",'" + Title + "','" + Name + "'," + Total_Balance + ",'" + Password + "'," + "SYSDATETIME())",
-                                            "update UserData set Title = '" + Title + "', Name = '" + Name + "', TotalBalance = " + Total_Balance + ", LastLoginDetails = SYSDATETIME() where AccountNumber = " + Account_Number
+                                            "update UserData set Title = '" + Title + "', Name = '" + Name + "', TotalBalance = " + Total_Balance + ", LastLoginDetails = SYSDATETIME() where AccountNumber = " + Account_Number,
+                                            "select Title, Name, TotalBalance from UserData where AccountNumber = " + TransferAccount,
+                                            "update UserData set TotalBalance = " + TransferBalance + " where AccountNumber = " + TransferAccount
                                            };
         return sqlCommand[i];
     }
@@ -40,7 +42,7 @@ private void SignUp()
         Console.Write("Enter the amount you want to deposit[Min Rs. 500] : ");
         Total_Balance = UInt32.Parse(Console.ReadLine());
         GenerateAccountNumber();
-        SetDataToTheDatabase(1);
+        SetDataToTheDatabase(2);
         Console.WriteLine("Thanks for banking with us | Your generated account number is " + Account_Number);
         Console.WriteLine("Please note down your account number and password");
     }   
@@ -138,7 +140,7 @@ private void SignUp()
     private static void SetDataToTheDatabase(int choice)
     {
         EstablishConnectionWithDatabase();
-        string LocalSqlCommand = (choice == 1) ? ReturnSqlCommand(2) : ReturnSqlCommand(3);
+        string LocalSqlCommand = ReturnSqlCommand(choice);
         SqlCommand command = new SqlCommand(LocalSqlCommand, connection);
         command.ExecuteNonQuery();
         command.Dispose();
@@ -201,19 +203,67 @@ private void SignUp()
     private static void WithdrawMoney()
     {
         Console.Write("Enter amount you want to withdraw : ");
-        Total_Balance -= UInt32.Parse(Console.ReadLine());
-        Console.WriteLine("Amount withdrawal from your account was successfull!");
+        Double WithDrawalAmount = Double.Parse(Console.ReadLine());
+        if (WithDrawalAmount <= Total_Balance)
+        {
+            Total_Balance -= WithDrawalAmount;
+            Console.WriteLine("Amount withdrawal from your account was successfull!");
+        }
+        else
+        {
+            Console.WriteLine("You don't have sufficient balance in your account to complete this transaction");
+        }
     }
-
     private static void TransferMoney()
     {
-
+        Console.Write("Enter amount you want to transfer : ");
+        Double TransferAmount = Double.Parse(Console.ReadLine());
+        if (TransferAmount <= Total_Balance)
+        {
+            Console.Write("Enter Account Number to which you want to transfer the funds to : ");
+            TransferAccount =  UInt32.Parse(Console.ReadLine());
+            EstablishConnectionWithDatabase();
+            SqlCommand command = new SqlCommand(ReturnSqlCommand(4), connection);
+            SqlDataReader dataReader = command.ExecuteReader();
+            
+            if (dataReader.Read())
+            {
+                Console.WriteLine("The account number : " + TransferAccount + " belongs to " + dataReader.GetValue(0) + ". " + dataReader.GetValue(1));
+                Console.Write("Do you want to proceed with this transaction[y/n] : ");
+                char ch = (char)Console.Read();
+                if (ch == 'y' || ch == 'Y')
+                {
+                    TransferBalance = Double.Parse("" + dataReader.GetValue(2));
+                    TransferBalance += TransferAmount;
+                    Total_Balance -= TransferAmount;
+                    SetDataToTheDatabase(5);
+                    SetDataToTheDatabase(3);
+                    Console.WriteLine("Amount has been successfully transfered from your account to " + dataReader.GetValue(0) + ". " + dataReader.GetValue(1) + "[" + TransferAccount + "]");
+                }
+                else
+                {
+                    Console.WriteLine("The transaction has been aborted");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Sorry but the account number : " + Account_Number + " does not exist in our database");
+                Console.WriteLine("Please check the account number and try again!");
+            }
+            dataReader.Close();
+            command.Dispose();
+            connection.Close();
+        }
+        else
+        {
+            Console.WriteLine("You don't have sufficient balance in your account to complete this transaction");
+        }
     }
 
     private static void Logout()
     {
         EstablishConnectionWithDatabase();
-        SetDataToTheDatabase(2);
+        SetDataToTheDatabase(3);
         Account_Number = 0;
         Total_Balance = 0;
         Title = Name = LastLoginDetails = Password = "";
