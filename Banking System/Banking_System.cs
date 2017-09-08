@@ -8,16 +8,6 @@ class Banking_System
     static private string Title, Name, LastLoginDetails, Password;
     static private SqlConnection connection;
 
-    private int Menu()
-    {
-        Console.WriteLine("1. Login for Existing Customers");
-        Console.WriteLine("2. Open a new Account");
-        Console.WriteLine("3. About Us");
-        Console.WriteLine("4. Exit");
-        Console.Write("Enter your choice : ");
-        return (int.Parse(Console.ReadLine()));
-    }
-
     private static string ReturnSqlCommand(int i)
     {
         string[] sqlCommand = new string[] {"select max(AccountNumber) from UserData",
@@ -30,7 +20,7 @@ class Banking_System
         return sqlCommand[i];
     }
 
-private void SignUp()
+    private void SignUp()
     {
         Console.Write("Enter your Full Name : ");
         Name = Console.ReadLine();
@@ -45,7 +35,48 @@ private void SignUp()
         SetDataToTheDatabase(2);
         Console.WriteLine("Thanks for banking with us | Your generated account number is " + Account_Number);
         Console.WriteLine("Please note down your account number and password");
-    }   
+    }
+
+    private int Menu()
+    {
+        Console.WriteLine("1. Login for Existing Customers");
+        Console.WriteLine("2. Open a new Account");
+        Console.WriteLine("3. About Us");
+        Console.WriteLine("4. Exit");
+        Console.Write("Enter your choice : ");
+        return (int.Parse(Console.ReadLine()));
+    }
+
+    private int LoggedInMenu()
+    {
+        Console.WriteLine("1. Deposit Money");
+        Console.WriteLine("2. Withdraw Money");
+        Console.WriteLine("3. Tranfer Money");
+        Console.WriteLine("4. Show My Account Details");
+        Console.WriteLine("5. Logout");
+        Console.Write("Enter your choice : ");
+        return (int.Parse(Console.ReadLine()));
+    }
+
+    private void ShowUserDetails()
+    {
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine("\nAccount Number            : {0,10}", Account_Number);
+        Console.WriteLine("Account Holder's Name     : {0,17}", Title + ". " + Name);
+        Console.WriteLine("Total Balance in account  : {0,10}", "Rs. " + Total_Balance);
+        Console.WriteLine("Last Login Details        : {0,21}", LastLoginDetails);
+        Console.ResetColor();
+    }
+
+    private void About()
+    {
+        Console.WriteLine("-------------------------------------------------------------------");
+        Console.WriteLine("{0,40}","Banking System v1.0");
+        Console.WriteLine("{0,45}","Developed By Megha Attri");
+        Console.WriteLine("{0,50}","Computer Engineering[Vth Sem]");
+        Console.WriteLine("-------------------------------------------------------------------");
+    }
 
     private static void GenerateAccountNumber()
     {
@@ -64,36 +95,6 @@ private void SignUp()
         dataReader.Close();
         command.Dispose();
         connection.Close();
-    }
-
-    private void About()
-    {
-        Console.WriteLine("-------------------------------------------------------------------");
-        Console.WriteLine("{0,40}","Banking System v1.0");
-        Console.WriteLine("{0,45}","Developed By Megha Attri");
-        Console.WriteLine("{0,50}","Computer Engineering[Vth Sem]");
-        Console.WriteLine("-------------------------------------------------------------------");
-    }
-
-    private int LoggedInMenu()
-    {
-        Console.WriteLine("1. Deposit Money");
-        Console.WriteLine("2. Withdraw Money");
-        Console.WriteLine("3. Tranfer Money");
-        Console.WriteLine("4. Logout");
-        Console.Write("Enter your choice : ");
-        return (int.Parse(Console.ReadLine()));
-    }
-
-    private void ShowUserDetails()
-    {
-        Console.BackgroundColor = ConsoleColor.DarkBlue;
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("\nAccount Number            : {0,10}", Account_Number);
-        Console.WriteLine("Account Holder's Name     : {0,17}", Title + ". " +Name);
-        Console.WriteLine("Total Balance in account  : {0,10}", "Rs. " + Total_Balance);
-        Console.WriteLine("Last Login Details        : {0,21}", LastLoginDetails);
-        Console.ResetColor();
     }
 
     private static void EstablishConnectionWithDatabase()
@@ -230,8 +231,8 @@ private void SignUp()
             {
                 Console.WriteLine("The account number : " + TransferAccount + " belongs to " + dataReader.GetValue(0) + ". " + dataReader.GetValue(1));
                 Console.Write("Do you want to proceed with this transaction[y/n] : ");
-                char ch = (char)Console.Read();
-                if (ch == 'y' || ch == 'Y')
+                char choice = Console.ReadLine()[0];
+                if (choice == 'y' || choice == 'Y')
                 {
                     TransferBalance = Double.Parse("" + dataReader.GetValue(2));
                     TransferBalance += TransferAmount;
