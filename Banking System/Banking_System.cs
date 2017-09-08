@@ -8,9 +8,15 @@ class Banking_System
     static private string Title, Name, LastLoginDetails, Password;
     static private SqlConnection connection;
 
+    public Banking_System()
+    {
+        Console.SetWindowSize(72, 25);
+    }
+
     private static string ReturnSqlCommand(int i)
     {
-        string[] sqlCommand = new string[] {"select max(AccountNumber) from UserData",
+        string[] sqlCommand = new string[] {
+                                            "select max(AccountNumber) from UserData",
                                             "select * from UserData where AccountNumber = " + Account_Number,
                                             "insert into UserData values(" + Account_Number + ",'" + Title + "','" + Name + "'," + Total_Balance + ",'" + Password + "'," + "SYSDATETIME())",
                                             "update UserData set Title = '" + Title + "', Name = '" + Name + "', TotalBalance = " + Total_Balance + ", LastLoginDetails = SYSDATETIME() where AccountNumber = " + Account_Number,
@@ -19,9 +25,9 @@ class Banking_System
                                            };
         return sqlCommand[i];
     }
-
     private void SignUp()
     {
+        Console.WriteLine("-----------------------------------------------------------------------");
         Console.Write("Enter your Full Name : ");
         Name = Console.ReadLine();
         Console.Write("Enter your gender[M/F] : ");
@@ -35,18 +41,19 @@ class Banking_System
         SetDataToTheDatabase(2);
         Console.WriteLine("Thanks for banking with us | Your generated account number is " + Account_Number);
         Console.WriteLine("Please note down your account number and password");
+        Console.WriteLine("-----------------------------------------------------------------------");
     }
-
     private int Menu()
     {
+        Console.WriteLine("-----------------------------------------------------------------------");
         Console.WriteLine("1. Login for Existing Customers");
         Console.WriteLine("2. Open a new Account");
         Console.WriteLine("3. About Us");
         Console.WriteLine("4. Exit");
+        Console.WriteLine("-----------------------------------------------------------------------");
         Console.Write("Enter your choice : ");
         return (int.Parse(Console.ReadLine()));
     }
-
     private int LoggedInMenu()
     {
         Console.WriteLine("1. Deposit Money");
@@ -57,7 +64,6 @@ class Banking_System
         Console.Write("Enter your choice : ");
         return (int.Parse(Console.ReadLine()));
     }
-
     private void ShowUserDetails()
     {
         Console.BackgroundColor = ConsoleColor.DarkBlue;
@@ -68,16 +74,21 @@ class Banking_System
         Console.WriteLine("Last Login Details        : {0,21}", LastLoginDetails);
         Console.ResetColor();
     }
-
     private void About()
     {
-        Console.WriteLine("-------------------------------------------------------------------");
-        Console.WriteLine("{0,40}","Banking System v1.0");
-        Console.WriteLine("{0,45}","Developed By Megha Attri");
-        Console.WriteLine("{0,50}","Computer Engineering[Vth Sem]");
-        Console.WriteLine("-------------------------------------------------------------------");
+        Console.WriteLine("-----------------------------------------------------------------------");
+        center("Banking System v1.0");
+        center("Developed By Megha Attri");
+        center("Computer Engineering[Vth Sem]");
+        Console.WriteLine("-----------------------------------------------------------------------");
     }
-
+    static void center(string message)
+    {
+        int screenWidth = Console.WindowWidth;
+        int stringWidth = message.Length;
+        int spaces = (screenWidth / 2) + (stringWidth / 2);
+        Console.WriteLine(message.PadLeft(spaces));
+    }
     private static void GenerateAccountNumber()
     {
         EstablishConnectionWithDatabase();
@@ -96,10 +107,9 @@ class Banking_System
         command.Dispose();
         connection.Close();
     }
-
     private static void EstablishConnectionWithDatabase()
     {
-        string ConnectionString = "Server = localhost\\SQLEXPRESS; Database = Banking-System;Integrated Security = SSPI";
+        string ConnectionString = "Server = localhost\\SQLEXPRESS; Database = Banking-System; Integrated Security = SSPI";
         connection = new SqlConnection(ConnectionString);
 
         try
@@ -111,7 +121,6 @@ class Banking_System
             Console.WriteLine("There is an error while establishing a connection with the SqlServer");
         }
     }
-
     private static bool GetDataFromTheDatabase()
     {
         bool AccountFound = false;
@@ -137,7 +146,6 @@ class Banking_System
         connection.Close();
         return AccountFound;
     }
-
     private static void SetDataToTheDatabase(int choice)
     {
         EstablishConnectionWithDatabase();
@@ -147,7 +155,6 @@ class Banking_System
         command.Dispose();
         connection.Close();
     }
-
     private void Login()
     {
         Console.Write("Enter your account number : ");
@@ -193,14 +200,12 @@ class Banking_System
             }
         }
     }
-
     private static void DepositMoney()
     {
         Console.Write("Enter amount you want to deposit : ");
         Total_Balance += UInt32.Parse(Console.ReadLine());
         Console.WriteLine("Amount deposited in your account successfully!");
     }
-
     private static void WithdrawMoney()
     {
         Console.Write("Enter amount you want to withdraw : ");
@@ -260,7 +265,6 @@ class Banking_System
             Console.WriteLine("You don't have sufficient balance in your account to complete this transaction");
         }
     }
-
     private static void Logout()
     {
         EstablishConnectionWithDatabase();
@@ -269,7 +273,6 @@ class Banking_System
         Total_Balance = 0;
         Title = Name = LastLoginDetails = Password = "";
     }
-
     static void Main(string[] args)
     {
         Banking_System obj = new Banking_System();
@@ -278,14 +281,21 @@ class Banking_System
             switch (obj.Menu())
             {
                 case 1: obj.Login();
+                    Console.Clear();
                     break;
                 case 2: obj.SignUp();
+                    Console.ReadKey();
+                    Console.Clear();
                     break;
                 case 3: obj.About();
+                    Console.ReadKey();
+                    Console.Clear();
                     break;
                 case 4: Environment.Exit(0);
                     break;
                 default: Console.WriteLine("Incorrect Option | Try Again");
+                    Console.ReadKey();
+                    Console.Clear();
                     break;
             }
         }
