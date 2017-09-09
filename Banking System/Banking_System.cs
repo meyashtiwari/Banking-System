@@ -27,7 +27,7 @@ class Banking_System
     }
     private void SignUp()
     {
-        Console.WriteLine("-----------------------------------------------------------------------");
+        Console.WriteLine("------------------------------------------------------------------------");
         Console.Write("Enter your Full Name : ");
         Name = Console.ReadLine();
         Console.Write("Enter your gender[M/F] : ");
@@ -39,18 +39,19 @@ class Banking_System
         Total_Balance = UInt32.Parse(Console.ReadLine());
         GenerateAccountNumber();
         SetDataToTheDatabase(2);
+        Console.WriteLine("------------------------------------------------------------------------");
         Console.WriteLine("Thanks for banking with us | Your generated account number is " + Account_Number);
         Console.WriteLine("Please note down your account number and password");
-        Console.WriteLine("-----------------------------------------------------------------------");
+        Console.WriteLine("------------------------------------------------------------------------");
     }
     private int Menu()
     {
-        Console.WriteLine("-----------------------------------------------------------------------");
+        Console.WriteLine("------------------------------------------------------------------------");
         Console.WriteLine("1. Login for Existing Customers");
         Console.WriteLine("2. Open a new Account");
         Console.WriteLine("3. About Us");
         Console.WriteLine("4. Exit");
-        Console.WriteLine("-----------------------------------------------------------------------");
+        Console.WriteLine("------------------------------------------------------------------------");
         Console.Write("Enter your choice : ");
         return (int.Parse(Console.ReadLine()));
     }
@@ -76,18 +77,24 @@ class Banking_System
     }
     private void About()
     {
-        Console.WriteLine("-----------------------------------------------------------------------");
-        center("Banking System v1.0");
-        center("Developed By Megha Attri");
-        center("Computer Engineering[Vth Sem]");
-        Console.WriteLine("-----------------------------------------------------------------------");
+        Console.WriteLine("------------------------------------------------------------------------");
+        Console.WriteLine("|{0}|",AlignText(22,"Both","Banking System v1.0"));
+        Console.WriteLine("|{0}|",AlignText(22,"Both","Developed By Megha"));
+        Console.WriteLine("|{0}|",AlignText(22,"Both","Computer Engineering[Vth Sem]"));
+        Console.WriteLine("------------------------------------------------------------------------");
     }
-    static void center(string message)
+    private static string AlignText(int SpacesToAdd, string alignment, string Msg)
     {
-        int screenWidth = Console.WindowWidth;
-        int stringWidth = message.Length;
-        int spaces = (screenWidth / 2) + (stringWidth / 2);
-        Console.WriteLine(message.PadLeft(spaces));
+        if (alignment == "Left")
+            Msg = (Msg.PadLeft(SpacesToAdd + Msg.Length));
+        else if (alignment == "Right")
+            Msg = (Msg.PadRight(SpacesToAdd + Msg.Length));
+        else
+        {
+            Msg = Msg.PadLeft(SpacesToAdd + Msg.Length);
+            Msg = Msg.PadRight((70 - Msg.Length) + Msg.Length);
+        }
+        return Msg;
     }
     private static void GenerateAccountNumber()
     {
@@ -288,6 +295,7 @@ class Banking_System
                     Console.Clear();
                     break;
                 case 3: obj.About();
+                    Console.WriteLine("Press any key to go back to the main menu!");
                     Console.ReadKey();
                     Console.Clear();
                     break;
