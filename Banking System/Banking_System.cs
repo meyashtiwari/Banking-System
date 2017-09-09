@@ -56,12 +56,12 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         Console.WriteLine("|{0}|",AlignText(35,"1. Login for Existing Customers"));
         Console.WriteLine("|{0}|",AlignText(35,"2. Open a new Account"));
         Console.WriteLine("|{0}|",AlignText(35,"3. About Us"));
         Console.WriteLine("|{0}|",AlignText(35,"4. Exit"));
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         DrawLine();
         Console.ResetColor();
         Console.Write("Enter your choice : ");
@@ -74,13 +74,13 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         Console.WriteLine("|{0}|",AlignText(37,"1. Deposit Money"));
         Console.WriteLine("|{0}|",AlignText(37,"2. Withdraw Money"));
         Console.WriteLine("|{0}|",AlignText(37,"3. Tranfer Money"));
         Console.WriteLine("|{0}|",AlignText(37,"4. Show My Account Details"));
         Console.WriteLine("|{0}|",AlignText(37,"5. Logout"));
-        Console.WriteLine("|{0}|", AlignText(25, ""));
+        Console.WriteLine("|{0}|",AlignText(25, ""));
         DrawLine();
         Console.ResetColor();
         Console.Write("Enter your choice : ");
@@ -91,12 +91,12 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         Console.WriteLine("|{0}|",AlignText(25, "Account Number            :  " + Account_Number));
         Console.WriteLine("|{0}|",AlignText(25, "Account Holder's Name     :  " + Title + ". " + Name));
         Console.WriteLine("|{0}|",AlignText(25, "Total Balance in account  :  " + "Rs. " + Total_Balance));
         Console.WriteLine("|{0}|",AlignText(25, "Last Login Details        :  " + LastLoginDetails));
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         DrawLine();
         Console.ResetColor();
     }
@@ -107,11 +107,11 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(34, ""));
+        Console.WriteLine("|{0}|",AlignText(34, ""));
         Console.WriteLine("|{0}|",AlignText(34,"GTBPI Banking System v1.2.0.8"));
         Console.WriteLine("|{0}|",AlignText(35,"Developed By Yash Bhardwaj"));
         Console.WriteLine("|{0}|",AlignText(34,"Computer Engineering[Vth Sem]"));
-        Console.WriteLine("|{0}|", AlignText(34, ""));
+        Console.WriteLine("|{0}|",AlignText(34, ""));
         DrawLine();
         Console.ResetColor();
     }
@@ -215,7 +215,7 @@ class Banking_System
         EstablishConnectionWithDatabase();
         if (GetDataFromTheDatabase())
         {
-            Console.Write("{0}", AlignText(27,"Enter your account password :  ","L"));
+            Console.Write("{0}",AlignText(27,"Enter your account password :  ","L"));
             string UserPassword = Console.ReadLine();
             if (UserPassword == Password)
             {
