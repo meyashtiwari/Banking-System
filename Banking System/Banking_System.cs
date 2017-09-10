@@ -1,29 +1,12 @@
 ﻿using System;
-using System.Data.SqlClient;
 
 class Banking_System
 {
-    static private UInt32 Account_Number, TransferAccount;
-    static private Double Total_Balance, TransferBalance;
-    static private string Title, Name, LastLoginDetails, Password;
-    static private SqlConnection connection;
-    
+    ReadAndWriteDataBase User = new ReadAndWriteDataBase();
     public Banking_System()
     {
         Console.SetWindowSize(100, 25);
-        Console.Title = "GTBPI Banking System";
-    }
-    private static string ReturnSqlCommand(int i)
-    {
-        string[] sqlCommand = new string[] {
-                                            "select max(AccountNumber) from UserData",
-                                            "select * from UserData where AccountNumber = " + Account_Number,
-                                            "insert into UserData values(" + Account_Number + ",'" + Title + "','" + Name + "'," + Total_Balance + ",'" + Password + "'," + "SYSDATETIME())",
-                                            "update UserData set Title = '" + Title + "', Name = '" + Name + "', TotalBalance = " + Total_Balance + ", LastLoginDetails = SYSDATETIME() where AccountNumber = " + Account_Number,
-                                            "select Title, Name, TotalBalance from UserData where AccountNumber = " + TransferAccount,
-                                            "update UserData set TotalBalance = " + TransferBalance + " where AccountNumber = " + TransferAccount
-                                           };
-        return sqlCommand[i];
+        Console.Title = "GTBPI Banking System[v1.2.0.8]";
     }
     private void SignUp()
     {
@@ -31,20 +14,19 @@ class Banking_System
         Center("**** GTBPI Banking System | Signup Page ****");
         DrawLine();
         Console.Write("{0}",AlignText(28,"Your Full Name          : ","L"));
-        Name = Console.ReadLine();
+        User.Name = Console.ReadLine();
         Console.Write("{0}",AlignText(28,"Your gender[M/F]        : ","L"));
         char Gender = Console.ReadLine()[0];
-        Title = (Gender == 'M' || Gender == 'm') ? "Mr" : "Ms"; 
+        User.Title = (Gender == 'M' || Gender == 'm') ? "Mr" : "Ms"; 
         Console.Write("{0}",AlignText(28,"Password[max 21 chars]  : ","L"));
-        Password = Console.ReadLine();
+        User.Password = Console.ReadLine();
         Console.Write("{0}",AlignText(28,"Enter amount to deposit : ","L"));
-        Total_Balance = UInt32.Parse(Console.ReadLine());
-        GenerateAccountNumber();
-        SetDataToTheDatabase(2);
+        User.Total_Balance = UInt32.Parse(Console.ReadLine());
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|",AlignText(13,"Thanks for banking with us | Your generated account number is " + Account_Number));
+        Console.WriteLine("|{0}|",AlignText(13,"Thanks for banking with us | Your generated account number is " + User.GenerateAccountNumber()));
+        User.WriteToDatabase(2);
         DrawLine();
         Console.ResetColor();
         Center("Please note down your account number and password!");
@@ -56,12 +38,12 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         Console.WriteLine("|{0}|",AlignText(35,"1. Login for Existing Customers"));
         Console.WriteLine("|{0}|",AlignText(35,"2. Open a new Account"));
         Console.WriteLine("|{0}|",AlignText(35,"3. About Us"));
         Console.WriteLine("|{0}|",AlignText(35,"4. Exit"));
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         DrawLine();
         Console.ResetColor();
         Console.Write("Enter your choice : ");
@@ -70,17 +52,17 @@ class Banking_System
     private int LoggedInMenu()
     {
         Console.Clear();
-        Center("**** GTBPI Banking System | Welcome " + Title + ". " + Name + " ****");
+        Center("**** GTBPI Banking System | Welcome " + User.Title + ". " + User.Name + " ****");
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         Console.WriteLine("|{0}|",AlignText(37,"1. Deposit Money"));
         Console.WriteLine("|{0}|",AlignText(37,"2. Withdraw Money"));
         Console.WriteLine("|{0}|",AlignText(37,"3. Tranfer Money"));
         Console.WriteLine("|{0}|",AlignText(37,"4. Show My Account Details"));
         Console.WriteLine("|{0}|",AlignText(37,"5. Logout"));
-        Console.WriteLine("|{0}|", AlignText(25, ""));
+        Console.WriteLine("|{0}|",AlignText(25, ""));
         DrawLine();
         Console.ResetColor();
         Console.Write("Enter your choice : ");
@@ -91,12 +73,12 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(35, ""));
-        Console.WriteLine("|{0}|",AlignText(25, "Account Number            :  " + Account_Number));
-        Console.WriteLine("|{0}|",AlignText(25, "Account Holder's Name     :  " + Title + ". " + Name));
-        Console.WriteLine("|{0}|",AlignText(25, "Total Balance in account  :  " + "Rs. " + Total_Balance));
-        Console.WriteLine("|{0}|",AlignText(25, "Last Login Details        :  " + LastLoginDetails));
-        Console.WriteLine("|{0}|", AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
+        Console.WriteLine("|{0}|",AlignText(25, "Account Number            :  " + User.Account_Number));
+        Console.WriteLine("|{0}|",AlignText(25, "Account Holder's Name     :  " + User.Title + ". " + User.Name));
+        Console.WriteLine("|{0}|",AlignText(25, "Total Balance in account  :  " + "Rs. " + User.Total_Balance));
+        Console.WriteLine("|{0}|",AlignText(25, "Last Login Details        :  " + User.LastLoginDetails));
+        Console.WriteLine("|{0}|",AlignText(35, ""));
         DrawLine();
         Console.ResetColor();
     }
@@ -107,11 +89,11 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         Console.ForegroundColor = ConsoleColor.White;
         DrawLine();
-        Console.WriteLine("|{0}|", AlignText(34, ""));
+        Console.WriteLine("|{0}|",AlignText(34, ""));
         Console.WriteLine("|{0}|",AlignText(34,"GTBPI Banking System v1.2.0.8"));
         Console.WriteLine("|{0}|",AlignText(35,"Developed By Yash Bhardwaj"));
         Console.WriteLine("|{0}|",AlignText(34,"Computer Engineering[Vth Sem]"));
-        Console.WriteLine("|{0}|", AlignText(34, ""));
+        Console.WriteLine("|{0}|",AlignText(34, ""));
         DrawLine();
         Console.ResetColor();
     }
@@ -137,87 +119,18 @@ class Banking_System
         int spaces = 50 + (message.Length / 2);
         Console.WriteLine(message.PadLeft(spaces));
     }
-    private static void GenerateAccountNumber()
-    {
-        EstablishConnectionWithDatabase();
-        SqlCommand command = new SqlCommand(ReturnSqlCommand(0), connection);
-        SqlDataReader dataReader = command.ExecuteReader();
-        dataReader.Read();
-        if (("" + dataReader.GetValue(0)) != "")
-        {
-            Account_Number = UInt32.Parse("" + dataReader.GetValue(0)) + 1;
-        }
-        else
-        {
-            Account_Number = 12081999;
-        }
-        dataReader.Close();
-        command.Dispose();
-        connection.Close();
-    }
-    private static void EstablishConnectionWithDatabase()
-    {
-        string ConnectionString = "Server = localhost\\SQLEXPRESS; Database = Banking-System; Integrated Security = SSPI";
-        connection = new SqlConnection(ConnectionString);
-
-        try
-        {
-            connection.Open();
-        }
-        catch (SqlException ex)
-        {
-            Console.WriteLine("There is an error while establishing a connection with the SqlServer");
-            Console.ReadKey();
-        }
-    }
-    private static bool GetDataFromTheDatabase()
-    {
-        bool AccountFound = false;
-        SqlCommand command = new SqlCommand(ReturnSqlCommand(1), connection);
-        SqlDataReader dataReader = command.ExecuteReader();
-
-        if (dataReader.Read())
-        {
-            Title = ("" + dataReader.GetValue(1));
-            Name = ("" + dataReader.GetValue(2));
-            Total_Balance = Double.Parse("" + dataReader.GetValue(3));
-            Password = ("" + dataReader.GetValue(4));
-            LastLoginDetails = ("" + dataReader.GetValue(5));
-            AccountFound = true;
-        }
-        else
-        {
-            Console.WriteLine("Sorry but the account number : " + Account_Number + " does not exist in our database");
-            AccountFound = false;
-            Console.ReadKey();
-        }
-        dataReader.Close();
-        command.Dispose();
-        connection.Close();
-        return AccountFound;
-    }
-    private static void SetDataToTheDatabase(int choice)
-    {
-        EstablishConnectionWithDatabase();
-        string LocalSqlCommand = ReturnSqlCommand(choice);
-        SqlCommand command = new SqlCommand(LocalSqlCommand, connection);
-        command.ExecuteNonQuery();
-        command.Dispose();
-        connection.Close();
-    }
     private void Login()
     {
         Console.Clear();
         Center("**** GTBPI Banking System | Login Page ****");
         DrawLine();
         Console.Write("{0}",AlignText(27,"Enter your account number   :  ","L"));
-        Account_Number = UInt32.Parse(Console.ReadLine());
-        EstablishConnectionWithDatabase();
-        if (GetDataFromTheDatabase())
+        User.Account_Number = UInt32.Parse(Console.ReadLine());
+        if (User.ReadFromDatabase())
         {
             Console.Write("{0}", AlignText(27,"Enter your account password :  ","L"));
             string UserPassword = Console.ReadLine();
-            if (UserPassword == Password)
+            if (UserPassword == User.Password)
             {
                 bool LoggedInFlag = true;
                 while (LoggedInFlag)
@@ -250,20 +163,26 @@ class Banking_System
                 Console.ReadKey();
             }
         }
+        else
+        {
+            Console.WriteLine("Sorry but the account number : " + User.Account_Number + " does not exist in our database");
+            Console.WriteLine("Please check the account number and try again!");
+            Console.ReadKey();
+        }
     }
-    private static void DepositMoney()
+    private void DepositMoney()
     {
         Console.Write("Enter amount you want to deposit : ");
-        Total_Balance += UInt32.Parse(Console.ReadLine());
+        User.Total_Balance += UInt32.Parse(Console.ReadLine());
         Console.WriteLine("Amount deposited in your account successfully!");
     }
-    private static void WithdrawMoney()
+    private void WithdrawMoney()
     {
         Console.Write("Enter amount you want to withdraw : ");
         Double WithDrawalAmount = Double.Parse(Console.ReadLine());
-        if (WithDrawalAmount <= Total_Balance)
+        if (WithDrawalAmount <= User.Total_Balance)
         {
-            Total_Balance -= WithDrawalAmount;
+            User.Total_Balance -= WithDrawalAmount;
             Console.WriteLine("Amount withdrawal from your account was successfull!");
         }
         else
@@ -272,47 +191,39 @@ class Banking_System
             Console.ReadKey();
         }
     }
-    private static void TransferMoney()
+    private void TransferMoney()
     {
         Console.Write("Enter amount you want to transfer : ");
         Double TransferAmount = Double.Parse(Console.ReadLine());
-        if (TransferAmount <= Total_Balance)
+        if (TransferAmount <= User.Total_Balance)
         {
+            ReadAndWriteDataBase Transfer = new ReadAndWriteDataBase();
             Console.Write("Enter Account Number to which you want to transfer the amount : ");
-            TransferAccount =  UInt32.Parse(Console.ReadLine());
-            EstablishConnectionWithDatabase();
-            SqlCommand command = new SqlCommand(ReturnSqlCommand(4), connection);
-            SqlDataReader dataReader = command.ExecuteReader();
-            
-            if (dataReader.Read())
+            Transfer.Account_Number =  UInt32.Parse(Console.ReadLine());
+            if (Transfer.ReadFromDatabase())
             {
-                Console.WriteLine("The account number : " + TransferAccount + " belongs to " + dataReader.GetValue(0) + ". " + dataReader.GetValue(1));
+                Console.WriteLine("The account number : " + Transfer.Account_Number + " belongs to " + Transfer.Title + ". " + Transfer.Name);
                 Console.Write("Do you want to proceed with this transaction[y/n] : ");
                 char choice = Console.ReadLine()[0];
                 if (choice == 'y' || choice == 'Y')
                 {
-                    TransferBalance = Double.Parse("" + dataReader.GetValue(2));
-                    TransferBalance += TransferAmount;
-                    Total_Balance -= TransferAmount;
-                    SetDataToTheDatabase(5);
-                    SetDataToTheDatabase(3);
-                    Console.WriteLine(TransferAmount + " has been successfully transfered to " + dataReader.GetValue(0) + ". " + dataReader.GetValue(1) + "[" + TransferAccount + "]");
+                    Transfer.Total_Balance += TransferAmount;
+                    User.Total_Balance -= TransferAmount;
+                    Transfer.WriteToDatabase(4);
+                    User.WriteToDatabase(3);
+                    Console.WriteLine(TransferAmount + " has been successfully transfered to " + Transfer.Title + ". " + Transfer.Name + "[" + Transfer.Account_Number + "]");
                 }
                 else
                 {
                     Console.WriteLine("The transaction has been aborted");
-                    Console.ReadKey();
                 }
             }
             else
             {
-                Console.WriteLine("Sorry but the account number : " + Account_Number + " does not exist in our database");
+                Console.WriteLine("Sorry but the account number : " + Transfer.Account_Number + " does not exist in our database");
                 Console.WriteLine("Please check the account number and try again!");
                 Console.ReadKey();
             }
-            dataReader.Close();
-            command.Dispose();
-            connection.Close();
         }
         else
         {
@@ -320,13 +231,13 @@ class Banking_System
             Console.ReadKey();
         }
     }
-    private static void Logout()
+    private void Logout()
     {
-        EstablishConnectionWithDatabase();
-        SetDataToTheDatabase(3);
-        Account_Number = 0;
-        Total_Balance = 0;
-        Title = Name = LastLoginDetails = Password = "";
+        User.WriteToDatabase(3);
+        User.Account_Number = 0;
+        User.Total_Balance = 0;
+        User.Title = User.Name = User.LastLoginDetails = User.Password = "";
+        User.Close();
     }
     static void Main(string[] args)
     {
