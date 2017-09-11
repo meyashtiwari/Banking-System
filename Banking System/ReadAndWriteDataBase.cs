@@ -39,13 +39,9 @@ class ReadAndWriteDataBase
         SqlDataReader DataReader = Command.ExecuteReader();
         DataReader.Read();
         if (("" + DataReader.GetValue(0)) != "")
-        {
             Account_Number = UInt32.Parse("" + DataReader.GetValue(0)) + 1;
-        }
         else
-        {
             Account_Number = 12081999;
-        }
         DataReader.Close();
         Command.Dispose();
         return Account_Number;
@@ -78,7 +74,7 @@ class ReadAndWriteDataBase
         command.Dispose();
         return AccountFound;
     }
-    public void Close()
+    public void CloseConnection()
     {
         Connection.Close();
         Connection.Dispose();
