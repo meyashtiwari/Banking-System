@@ -224,6 +224,7 @@ class Banking_System
                 Console.WriteLine("Please check the account number and try again!");
                 Console.ReadKey();
             }
+            Transfer.Close();
         }
         else
         {
