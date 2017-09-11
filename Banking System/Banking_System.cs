@@ -9,6 +9,41 @@ class Banking_System
         Console.Title = "GTBPI Banking System[v1.2.0.8]";
         Console.ForegroundColor = ConsoleColor.White;
     }
+    private int MainMenu()
+    {
+        Console.Clear();
+        Center("**** Welcome to GTBPI Banking System ****\n");
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        DrawLine();
+        Console.WriteLine("|{0}|", AlignText(0, ""));
+        Console.WriteLine("|{0}|", AlignText(35, "1. Login for Existing Customers"));
+        Console.WriteLine("|{0}|", AlignText(35, "2. Open a new Account"));
+        Console.WriteLine("|{0}|", AlignText(35, "3. About Us"));
+        Console.WriteLine("|{0}|", AlignText(35, "4. Exit"));
+        Console.WriteLine("|{0}|", AlignText(0, ""));
+        DrawLine();
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.Write("\n{0}", AlignText(36, "Enter your choice : ", "L"));
+        return (int.Parse(Console.ReadLine()));
+    }
+    private int LoggedInMenu()
+    {
+        Console.Clear();
+        Center("**** GTBPI Banking System | Welcome " + User.Title + ". " + User.Name + " ****\n");
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        DrawLine();
+        Console.WriteLine("|{0}|", AlignText(0, ""));
+        Console.WriteLine("|{0}|", AlignText(37, "1. Deposit Money"));
+        Console.WriteLine("|{0}|", AlignText(37, "2. Withdraw Money"));
+        Console.WriteLine("|{0}|", AlignText(37, "3. Tranfer Money"));
+        Console.WriteLine("|{0}|", AlignText(37, "4. Show My Account Details"));
+        Console.WriteLine("|{0}|", AlignText(37, "5. Logout"));
+        Console.WriteLine("|{0}|", AlignText(0, ""));
+        DrawLine();
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.Write("\n{0}", AlignText(38, "Enter your choice : ", "L"));
+        return (int.Parse(Console.ReadLine()));
+    }
     private void SignUp()
     {
         Console.Clear();
@@ -33,40 +68,102 @@ class Banking_System
         Console.BackgroundColor = ConsoleColor.Black;
         Center("Please note down your account number and password!");
     }
-    private int Menu()
+    private void About()
     {
         Console.Clear();
-        Center("**** Welcome to GTBPI Banking System ****\n");
+        Center("**** GTBPI Banking System | About Us ****\n");
         Console.BackgroundColor = ConsoleColor.DarkBlue;
         DrawLine();
-        Console.WriteLine("|{0}|",AlignText(0, ""));
-        Console.WriteLine("|{0}|",AlignText(35,"1. Login for Existing Customers"));
-        Console.WriteLine("|{0}|",AlignText(35,"2. Open a new Account"));
-        Console.WriteLine("|{0}|",AlignText(35,"3. About Us"));
-        Console.WriteLine("|{0}|",AlignText(35,"4. Exit"));
-        Console.WriteLine("|{0}|",AlignText(0, ""));
+        Console.WriteLine("|{0}|", AlignText(0, ""));
+        Console.WriteLine("|{0}|", AlignText(34, "GTBPI Banking System v1.2.0.8"));
+        Console.WriteLine("|{0}|", AlignText(35, "Developed By Yash Bhardwaj"));
+        Console.WriteLine("|{0}|", AlignText(34, "Computer Engineering[Vth Sem]"));
+        Console.WriteLine("|{0}|", AlignText(0, ""));
         DrawLine();
         Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write("\n{0}",AlignText(36,"Enter your choice : ","L"));
-        return (int.Parse(Console.ReadLine()));
     }
-    private int LoggedInMenu()
+    private void DepositMoney()
     {
         Console.Clear();
-        Center("**** GTBPI Banking System | Welcome " + User.Title + ". " + User.Name + " ****\n");
-        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        Center("**** GTBPI Banking System | Deposit Money ****\n");
         DrawLine();
-        Console.WriteLine("|{0}|",AlignText(0, ""));
-        Console.WriteLine("|{0}|",AlignText(37,"1. Deposit Money"));
-        Console.WriteLine("|{0}|",AlignText(37,"2. Withdraw Money"));
-        Console.WriteLine("|{0}|",AlignText(37,"3. Tranfer Money"));
-        Console.WriteLine("|{0}|",AlignText(37,"4. Show My Account Details"));
-        Console.WriteLine("|{0}|",AlignText(37,"5. Logout"));
-        Console.WriteLine("|{0}|",AlignText(0, ""));
+        Console.Write("{0}",AlignText(30,"Enter amount you want to deposit : ","L"));
+        User.Total_Balance += UInt32.Parse(Console.ReadLine());
+        Console.WriteLine("\n");
+        Center("Amount deposited in your account successfully!");
+        UpdatedBalance();
+    }
+    private void WithdrawMoney()
+    {
+        Console.Clear();
+        Center("**** GTBPI Banking System | Withdraw Money ****\n");
+        DrawLine();
+        Console.Write("{0}",AlignText(30,"Enter amount you want to withdraw : ","L"));
+        Double WithDrawalAmount = Double.Parse(Console.ReadLine());
+        Console.WriteLine("\n");
+        if (WithDrawalAmount <= User.Total_Balance)
+        {
+            User.Total_Balance -= WithDrawalAmount;
+            Center("Amount withdrawal from your account was successfull!");
+            UpdatedBalance();
+        }
+        else
+            Center("You don't have sufficient balance in your account to complete this transaction!");
+    }
+    private void UpdatedBalance()
+    {
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        Console.WriteLine("\n");
+        DrawLine();
+        Console.WriteLine("|{0}|", AlignText(25, "Updated balance in your account is Rs. " + User.Total_Balance));
         DrawLine();
         Console.BackgroundColor = ConsoleColor.Black;
-        Console.Write("\n{0}",AlignText(38,"Enter your choice : ","L"));
-        return (int.Parse(Console.ReadLine()));
+    }
+    private void TransferMoney()
+    {
+        Console.Clear();
+        Center("**** GTBPI Banking System | Transfer Money ****\n");
+        DrawLine();
+        Console.Write("{0}",AlignText(20,"Enter amount you want to transfer               : ","L"));
+        Double TransferAmount = Double.Parse(Console.ReadLine());
+        if (TransferAmount <= User.Total_Balance)
+        {
+            ReadAndWriteDataBase Transfer = new ReadAndWriteDataBase();
+            Console.Write("{0}",AlignText(20,"Enter Account Number where you want to transfer : ","L"));
+            Transfer.Account_Number = UInt32.Parse(Console.ReadLine());
+            if (Transfer.ReadFromDatabase())
+            {
+                Console.WriteLine("\n{0}",AlignText(20,"The account number " + Transfer.Account_Number + " belongs to " + Transfer.Title + ". " + Transfer.Name,"L"));
+                Console.Write("{0}",AlignText(20,"Do you want to proceed with this transaction [y/n] ","L"));
+                char choice = Console.ReadLine()[0];
+                Console.WriteLine("\n");
+                if (choice == 'y' || choice == 'Y')
+                {
+                    Transfer.Total_Balance += TransferAmount;
+                    User.Total_Balance -= TransferAmount;
+                    Transfer.WriteToDatabase(4);
+                    User.WriteToDatabase(3);
+                    Center("Rs. " + TransferAmount + " has been successfully transfered to " + Transfer.Title + ". " + Transfer.Name + "[" + Transfer.Account_Number + "]");
+                    UpdatedBalance();
+                }
+                else
+                {
+                    Center("The transaction has been aborted!");
+                }
+            }
+            else
+            {
+                Console.WriteLine("\n");
+                Center("Sorry but the account number : " + Transfer.Account_Number + " does not exist in our database");
+                Center("Please check the account number and try again!");
+            }
+            Transfer.CloseConnection();
+        }
+        else
+        {
+            Console.WriteLine("\n");
+            Center("You don't have sufficient balance in your account to complete this transaction");
+        }
     }
     private void ShowUserDetails()
     {
@@ -85,19 +182,13 @@ class Banking_System
         Console.WriteLine("\n");
         Center("Press any key to go back to the previous menu!");
     }
-    private void About()
+    private void Logout()
     {
-        Console.Clear();
-        Center("**** GTBPI Banking System | About Us ****\n");
-        Console.BackgroundColor = ConsoleColor.DarkBlue;
-        DrawLine();
-        Console.WriteLine("|{0}|",AlignText(0, ""));
-        Console.WriteLine("|{0}|",AlignText(34,"GTBPI Banking System v1.2.0.8"));
-        Console.WriteLine("|{0}|",AlignText(35,"Developed By Yash Bhardwaj"));
-        Console.WriteLine("|{0}|",AlignText(34,"Computer Engineering[Vth Sem]"));
-        Console.WriteLine("|{0}|",AlignText(0, ""));
-        DrawLine();
-        Console.BackgroundColor = ConsoleColor.Black;
+        User.WriteToDatabase(3);
+        Console.WriteLine("\n");
+        Center("Thanks for using our service!");
+        Center("You have been successfully logged out!");
+        Center("Press any key to go back to the main menu!");
     }
     private string AlignText(int SpacesToAdd, string Msg, string Alignment = "R")
     {
@@ -156,90 +247,20 @@ class Banking_System
                 }
             }
             else
-            {
-                Console.WriteLine("The password you entered is incorrect");
-                Console.ReadKey();
-            }
+                Center("The password you entered is incorrect");
         }
         else
         {
-            Console.WriteLine("Sorry but the account number : " + User.Account_Number + " does not exist in our database");
-            Console.WriteLine("Please check the account number and try again!");
-            Console.ReadKey();
+            Center("Sorry but the account number : " + User.Account_Number + " does not exist in our database");
+            Center("Please check the account number and try again!");
         }
-    }
-    private void DepositMoney()
-    {
-        Console.Write("Enter amount you want to deposit : ");
-        User.Total_Balance += UInt32.Parse(Console.ReadLine());
-        Console.WriteLine("Amount deposited in your account successfully!");
-    }
-    private void WithdrawMoney()
-    {
-        Console.Write("Enter amount you want to withdraw : ");
-        Double WithDrawalAmount = Double.Parse(Console.ReadLine());
-        if (WithDrawalAmount <= User.Total_Balance)
-        {
-            User.Total_Balance -= WithDrawalAmount;
-            Console.WriteLine("Amount withdrawal from your account was successfull!");
-        }
-        else
-        {
-            Console.WriteLine("You don't have sufficient balance in your account to complete this transaction");
-        }
-    }
-    private void TransferMoney()
-    {
-        Console.Write("Enter amount you want to transfer : ");
-        Double TransferAmount = Double.Parse(Console.ReadLine());
-        if (TransferAmount <= User.Total_Balance)
-        {
-            ReadAndWriteDataBase Transfer = new ReadAndWriteDataBase();
-            Console.Write("Enter Account Number to which you want to transfer the amount : ");
-            Transfer.Account_Number =  UInt32.Parse(Console.ReadLine());
-            if (Transfer.ReadFromDatabase())
-            {
-                Console.WriteLine("The account number : " + Transfer.Account_Number + " belongs to " + Transfer.Title + ". " + Transfer.Name);
-                Console.Write("Do you want to proceed with this transaction[y/n] : ");
-                char choice = Console.ReadLine()[0];
-                if (choice == 'y' || choice == 'Y')
-                {
-                    Transfer.Total_Balance += TransferAmount;
-                    User.Total_Balance -= TransferAmount;
-                    Transfer.WriteToDatabase(4);
-                    User.WriteToDatabase(3);
-                    Console.WriteLine(TransferAmount + " has been successfully transfered to " + Transfer.Title + ". " + Transfer.Name + "[" + Transfer.Account_Number + "]");
-                }
-                else
-                {
-                    Console.WriteLine("The transaction has been aborted");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Sorry but the account number : " + Transfer.Account_Number + " does not exist in our database");
-                Console.WriteLine("Please check the account number and try again!");
-            }
-            Transfer.CloseConnection();
-        }
-        else
-            Console.WriteLine("You don't have sufficient balance in your account to complete this transaction");
-    }
-    private void Logout()
-    {
-        User.WriteToDatabase(3);
-        User.CloseConnection();
-        Console.WriteLine("\n");
-        Center("Thanks for using our service!");
-        Center("You have been successfully logged out!");
-        Center("Press any key to go back to the main menu!");
     }
     static void Main(string[] args)
     {
         Banking_System obj = new Banking_System();
         while(true)
         {
-            switch (obj.Menu())
+            switch (obj.MainMenu())
             {
                 case 1: obj.Login();
                         break;
