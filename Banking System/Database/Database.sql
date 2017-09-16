@@ -10,4 +10,12 @@ create table UserData (
 	LastLoginDetails smallDatetime
 )
 
+create table Passbook (
+	AccountNumber numeric(9) Not Null,
+	Amount float(15) Not Null,
+	TimeOfTransaction smalldatetime,
+	Mode varchar(25) Not Null
+)
+
+select * from Passbook
 select * from UserData

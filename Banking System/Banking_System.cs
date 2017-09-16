@@ -24,7 +24,12 @@ class Banking_System
         DrawLine();
         Console.BackgroundColor = ConsoleColor.Black;
         Console.Write("\n{0}", AlignText(36, "Enter your choice : ", "L"));
-        return (int.Parse(Console.ReadLine()));
+        try {
+            return (int.Parse(Console.ReadLine()));
+        } catch (FormatException)
+        {
+            return 0;
+        }
     }
     private int LoggedInMenu()
     {
@@ -36,13 +41,20 @@ class Banking_System
         Console.WriteLine("|{0}|", AlignText(37, "1. Deposit Money"));
         Console.WriteLine("|{0}|", AlignText(37, "2. Withdraw Money"));
         Console.WriteLine("|{0}|", AlignText(37, "3. Tranfer Money"));
-        Console.WriteLine("|{0}|", AlignText(37, "4. Show My Account Details"));
-        Console.WriteLine("|{0}|", AlignText(37, "5. Logout"));
+        Console.WriteLine("|{0}|", AlignText(37, "4. My Passbook"));
+        Console.WriteLine("|{0}|", AlignText(37, "5. Show My Account Details"));
+        Console.WriteLine("|{0}|", AlignText(37, "6. Logout"));
         Console.WriteLine("|{0}|", AlignText(0, ""));
         DrawLine();
         Console.BackgroundColor = ConsoleColor.Black;
         Console.Write("\n{0}", AlignText(38, "Enter your choice : ", "L"));
-        return (int.Parse(Console.ReadLine()));
+        try
+        {
+            return (int.Parse(Console.ReadLine()));
+        }catch(FormatException)
+        {
+            return 0;
+        }
     }
     private void SignUp()
     {
@@ -63,6 +75,7 @@ class Banking_System
         DrawLine();
         Console.WriteLine("|{0}|",AlignText(13,"Thanks for banking with us | Your generated account number is " + User.GenerateAccountNumber()));
         User.WriteToDatabase(2);
+        User.UpdatePassbook(User.Total_Balance, "Deposit");
         DrawLine();
         Console.WriteLine("\n");
         Console.BackgroundColor = ConsoleColor.Black;
@@ -88,9 +101,11 @@ class Banking_System
         Center("**** GTBPI Banking System | Deposit Money ****\n");
         DrawLine();
         Console.Write("{0}",AlignText(30,"Enter amount you want to deposit : ","L"));
-        User.Total_Balance += UInt32.Parse(Console.ReadLine());
+        Double DepositAmount = Double.Parse(Console.ReadLine());
+        User.Total_Balance += DepositAmount;
         Console.WriteLine("\n");
         Center("Amount deposited in your account successfully!");
+        User.UpdatePassbook(DepositAmount, "Deposit");
         UpdatedBalance();
     }
     private void WithdrawMoney()
@@ -105,6 +120,7 @@ class Banking_System
         {
             User.Total_Balance -= WithDrawalAmount;
             Center("Amount withdrawal from your account was successfull!");
+            User.UpdatePassbook(WithDrawalAmount, "Withdrawal");
             UpdatedBalance();
         }
         else
@@ -144,6 +160,8 @@ class Banking_System
                     Transfer.WriteToDatabase(4);
                     User.WriteToDatabase(3);
                     Center("Rs. " + TransferAmount + " has been successfully transfered to " + Transfer.Title + ". " + Transfer.Name + "[" + Transfer.Account_Number + "]");
+                    User.UpdatePassbook(TransferAmount, "NEFT To " + Transfer.Account_Number);
+                    Transfer.UpdatePassbook(TransferAmount, "NEFT From " + User.Account_Number);
                     UpdatedBalance();
                 }
                 else
@@ -234,12 +252,15 @@ class Banking_System
                                 break;
                         case 3: TransferMoney();
                                 break;
-                        case 4: ShowUserDetails();
+                        case 4: Passbook();
                                 break;
-                        case 5: Logout();
+                        case 5: ShowUserDetails();
+                                break;
+                        case 6: Logout();
                                 LoggedInFlag = false;
                                 break;
-                        default:Center("Incorrect Option | Try Again!");
+                        default:Console.WriteLine("\n");
+                                Center("Incorrect Option | Try Again!");
                                 break;
                     }
                     if (LoggedInFlag)
@@ -255,6 +276,32 @@ class Banking_System
             Center("Please check the account number and try again!");
         }
     }
+
+    private void Passbook()
+    {
+        Console.Clear();
+        Center("**** GTBPI Banking System | My Passbook ****\n");
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        DrawLine();
+        Console.WriteLine("|{0}|",AlignText(5,"Transaction Amount    |" + "    Time and Date of Transaction    |" + "    Transaction Description"));
+        DrawLine();
+        Console.WriteLine("|{0}|", AlignText(0, "|".PadLeft(28) + "|".PadLeft(37)));
+        System.Data.SqlClient.SqlDataReader dataReader = User.ReadPassbook();
+        while (dataReader.Read())
+        {
+            int Length = dataReader.GetValue(1).ToString().Length;
+            int DescLength = dataReader.GetValue(3).ToString().Length;
+            string Amount = dataReader.GetValue(1).ToString(), DateAndTime = dataReader.GetValue(2).ToString().PadLeft(27).PadRight(36), Description = dataReader.GetValue(3).ToString().PadLeft(DescLength + 8);
+            Console.WriteLine("|{0}|",AlignText(9,"Rs. " + Amount.PadRight(((14-Length)+Length)) + "|" + DateAndTime + "|" + Description));
+        }
+        Console.WriteLine("|{0}|", AlignText(0, "|".PadLeft(28) + "|".PadLeft(37)));
+        DrawLine();
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.WriteLine("\n");
+        Center("Press any key to go back to the previous menu!");
+        dataReader.Close();
+    }
+
     static void Main(string[] args)
     {
         Banking_System obj = new Banking_System();

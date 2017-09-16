@@ -16,7 +16,7 @@ class ReadAndWriteDataBase
         {
             Connection.Open();
         }
-        catch (SqlException ex)
+        catch (SqlException)
         {
             Console.WriteLine("There is an error while establishing a connection with the SqlServer");
             Console.ReadKey();
@@ -29,7 +29,8 @@ class ReadAndWriteDataBase
             "select * from UserData where AccountNumber = " + Account_Number,
             "insert into UserData values(" + Account_Number + ",'" + Title + "','" + Name + "'," + Total_Balance + ",'" + Password + "'," + "SYSDATETIME())",
             "update UserData set Title = '" + Title + "', Name = '" + Name + "', TotalBalance = " + Total_Balance + ", LastLoginDetails = SYSDATETIME() where AccountNumber = " + Account_Number,
-            "update UserData set TotalBalance = " + Total_Balance + " where AccountNumber = " + Account_Number
+            "update UserData set TotalBalance = " + Total_Balance + " where AccountNumber = " + Account_Number,
+            "select * from Passbook where AccountNumber = " + Account_Number
         };
         return Query[i];
     }
@@ -49,6 +50,19 @@ class ReadAndWriteDataBase
     public void WriteToDatabase(int choice)
     {
         SqlCommand command = new SqlCommand(GetQuery(choice), Connection);
+        command.ExecuteNonQuery();
+        command.Dispose();
+    }
+    public SqlDataReader ReadPassbook()
+    {
+        SqlCommand command = new SqlCommand(GetQuery(5), Connection);
+        SqlDataReader dataReader = command.ExecuteReader();
+        return dataReader;
+    }
+    public void UpdatePassbook(Double Amount,string Description)
+    {
+        string Query = "insert into Passbook values(" + Account_Number + "," + Amount + ", SYSDATETIME(),'" + Description + "')";
+        SqlCommand command = new SqlCommand(Query, Connection);
         command.ExecuteNonQuery();
         command.Dispose();
     }
